@@ -59,9 +59,12 @@ def feature_transformer(emo, train_pos, train_neg, test_pos, test_neg):
 
 def feature_transformer2(data,emo):
     stopWords = stopwords.words('english')
-    data = [preprocess(data['text'].encode('utf-8'))]
-    lexicon_feat = LexiconVectorizer()
-    embed_feat = EmbeddingVectorizer()
+    if type(data) == dict:
+        data = [preprocess(data['text']).encode('utf-8')]
+    elif type(data) == list:
+        data = [preprocess(d['text']).encode('utf-8') for d in data]
+    lexicon_feat = LexiconVectorizer() # Globalise these two transformers
+    embed_feat = EmbeddingVectorizer() # Globalise these two transformers
     tfidf_feat = TfidfVectorizer(ngram_range=(1,3), analyzer='word', binary=False, stop_words=stopWords, min_df=0.01, use_idf=True)
     all_features = FeatureUnion([('lexicon_feature', lexicon_feat), ('embeddings', embed_feat)])
     pipeline = Pipeline([('all_feature', all_features)])
